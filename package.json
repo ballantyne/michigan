@@ -1,0 +1,20 @@
+{
+  "name": "michigan",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -w test/"
+  },
+  "keywords": [
+    "michigan",
+    "cofs",
+    "lara",
+    "fakeApi"
+  ],
+  "author": "Scott Ballantyne",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "cache-rules-everything-around-me": "^1.0.0"
+  }
+}
