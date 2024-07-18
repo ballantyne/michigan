@@ -2,17 +2,12 @@ const path  = require('path');
 const https = require('https');
 const qs    = require('querystring');
 
-const { applyOptions, copyObj, merge, constructOptions } = require(path.join(__dirname, 'tools'));
-
-
-
 
 
 
 
 
 const post = function(options={}, postData="", config={}) {
-  
   if (config.data == undefined) {
     config.data = false;
   }
@@ -37,8 +32,6 @@ const post = function(options={}, postData="", config={}) {
 	  data = data.toString();
 	}
 
-	//console.log(res.headers);
-
 	resolve({headers: res.headers, body: data});
       });
     })
@@ -46,7 +39,6 @@ const post = function(options={}, postData="", config={}) {
     req.on('error',reject);
 
     if (postData != undefined) {
-      //console.log(postData);
       req.write(postData)
     }
 
@@ -60,22 +52,14 @@ module.exports.post = post;
 
 
 
-
-
-
 const get = function(options, config={}) {
   if (config.data == undefined) {
     config.data = false;
   }
 
-  //console.log('get', options);
-
   return new Promise((resolve,reject) => {
     const req = https.request(options, res => {
       const chunks = [];
-
-
-      //console.log('requesting');
 
       res.on('data', data => chunks.push(data))
 
@@ -85,8 +69,6 @@ const get = function(options, config={}) {
 	if (config.data == false) {
 	  data = data.toString();
         }
-
-	//console.log('data', data);
 
 	var response = {headers: res.headers, body: data};
 

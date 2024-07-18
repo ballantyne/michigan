@@ -14,6 +14,7 @@ const {
 
 
 
+
 const findById = function(id, config={}) {
   var params = constructQuery('byId', { SearchValue: id })
   
@@ -64,11 +65,6 @@ module.exports.find = findById;
 
 
 
-
-
-
-
-
 const search = function(query, config) {
   var params, options;
 
@@ -98,7 +94,7 @@ const search = function(query, config) {
       var response = await http.post(options, params, config);
     }
 
-    var list = await Parser.searchList(response.body, config, {params: params});
+    var list = await Parser.search(response.body, config, {params: params});
     
     if (config.cache && cache.missed) {
       await cache.write(JSON.stringify(response));
@@ -111,8 +107,8 @@ const search = function(query, config) {
     resolve(list);
   })
 }
-
 module.exports.search = search;
+
 
 
 
@@ -123,6 +119,7 @@ const entities = function(query, config={}) {
   return search(query, config);
 }
 module.exports.entities = entities;
+
 
 
 

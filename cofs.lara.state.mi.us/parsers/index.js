@@ -20,51 +20,39 @@ const {
 
 
 
-var searchList = function(html, config={}, meta={}) {
+var search = function(html, config={}, meta={}) {
  
   if (config.meta) {
     Object.assign(meta, {version: {cache: fingerprint('list', html)}});
   }
 
-  var ignoranceRules = requireJSON(path.join(__dirname, 'search', 'ignore'));
-
-  var ignorance = ignoramous(ignoranceRules);
-
-  var transitions = requireJSON(path.join(__dirname, 'search', 'transitions'));
-
   var fields = {
     id_number: 'id_number'
   }
-
-
+  
+  var ignoranceRules = requireJSON(path.join(__dirname, 'search', 'ignore'));
+  var ignorance = ignoramous(ignoranceRules);
+  var transitions = requireJSON(path.join(__dirname, 'search', 'transitions'));
   var modulator = modulatorize(transitions);
-
   var context = {state: 'scan', parser: 'none', headers: []};
 
   //config.verbose = true;
-
-  //console.log('starting reduction');
 
   return new Promise((resolve) => {
     var rows = html.split("\n").reduce((obj, raw, index) => {
 
       var line = raw.trim();
  
-      //console.log('raw', raw);
-
       if (ignorance(line, ignoranceRules)) {
 	line = line.replace('<td>', '').replace('</td>', '').trim();
 
         var modulations = modulator(context.state, line, transitions);
 
-
 	if (config.verbose) {
 	  console.log('');
 	  console.log('------------------------------------------------------')
 	  console.log(line);
-	  //console.log('raw:', raw);
 	  console.log('state:',context.state);
-	  //console.log('#:',index);
 
           if (modulations.length > 0) {
 	    console.log('.......................................................')
@@ -85,7 +73,6 @@ var searchList = function(html, config={}, meta={}) {
 	while(changes.length > 0) {
 	  var change = changes.shift();
 	  Object.assign(context, copyObj(change.sets));
-	  //console.log('change:set', change);
 	}
 
 	while(actions.length > 0) {
@@ -100,7 +87,6 @@ var searchList = function(html, config={}, meta={}) {
 	
 	    case 'total_records':
 	      var matched = line.match(/<label id="TotalRecords">Number of Records: (?<total_records>.+)</);
-	      //console.log(matched);
 	      meta.total_records = parseInt(matched.groups.total_records.replace(',', ''));
 
 	      break;
@@ -136,7 +122,6 @@ var searchList = function(html, config={}, meta={}) {
 	      break;
 	  }
 
-	  //console.log('finished:actions');
 	}
 
 
@@ -170,7 +155,6 @@ var searchList = function(html, config={}, meta={}) {
 	      break;
 	  }
 	}
-	//console.log('finished:collection');
 
       }
 
@@ -207,7 +191,7 @@ var searchList = function(html, config={}, meta={}) {
   }) 
 }
 
-module.exports.searchList = searchList;
+module.exports.search = search;
 
 
 

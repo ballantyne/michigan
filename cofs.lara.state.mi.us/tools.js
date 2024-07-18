@@ -39,9 +39,11 @@ function requireJSON(file) {
 module.exports.requireJSON = requireJSON;
 
 
+var defaults = requireJSON(path.join(__dirname, 'defaults'));
+var queries  = requireJSON(path.join(__dirname, 'queries'));
 
-var defaults = readJSON(path.join(__dirname, 'defaults.json'));
-var queries  = readJSON(path.join(__dirname, 'queries.json'));
+
+
 
 
 
@@ -71,12 +73,9 @@ const prepareCache = function(config) {
     cacheOptions.ttl = config.ttl;
   }
 
-  //console.log('fetch');
-
   if (config.cache) {
     return new Promise((resolve) => {
       cache.fetch(cacheOptions).then(() => {
-        //console.log(cache);
 	resolve(cache);
       });
     })
