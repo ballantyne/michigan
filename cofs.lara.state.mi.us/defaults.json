@@ -1,0 +1,24 @@
+{
+  "default": { 
+    "hostname": "cofs.lara.state.mi.us",
+    "headers": {
+      "User-Agent": "[npm|github]:ballantyne/michigan/cofs.lara.state.mi.us",
+      "Host":    "cofs.lara.state.mi.us",
+      "Origin":  "https://cofs.lara.state.mi.us"
+    }
+  },
+  "post": {
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+  },
+  "search": {
+    "headers": {
+      "Referer": "https://cofs.lara.state.mi.us/SearchApi/Search/Search"
+    }
+  },
+  "get": {
+    "method": "GET"
+  }
+}

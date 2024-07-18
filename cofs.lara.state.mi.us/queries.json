@@ -1,0 +1,21 @@
+{
+  "sort": {
+    "SortColumn": "",
+    "SortDirection": ""
+  },
+  "first": {
+    "StartRange": 1,
+    "EndRange": 25
+  },
+  "entities": {
+    "SearchType": "E",
+    "SearchMethod": "B"
+  },
+  "individual": {
+    "SearchType": "I",
+    "SearchMethod": "B"
+  },
+  "byId": {
+    "SearchType": "N"
+  }
+}

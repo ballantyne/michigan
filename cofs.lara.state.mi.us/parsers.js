@@ -3,146 +3,27 @@ const path = require('path');
 const { createHmac } = require('node:crypto');
 const sortKeysRecursive = require('sort-keys-recursive');
 
-
-function newCursor(meta) {
-  var toAssign = {};
-  
-  var cursor = copyObj(meta.params);
-  delete cursor.StartRange;
-  delete cursor.EndRange;
-
-  var newPagination = {};
-  
-  var pageSize = meta.params.EndRange-meta.params.StartRange;
-  newPagination.StartRange = meta.params.EndRange + 1;
-  newPagination.EndRange = pageSize + newPagination.StartRange;
-
-  if (newPagination.EndRange > meta.total_records) {
-    newPagination.EndRange = meta.total_records;
-  } 
-
-  if (newPagination.StartRange < meta.total_records) {
-    Object.assign(cursor, newPagination);
-    toAssign.next_cursor = cursor;  
-  }
-  
-  return toAssign;
-}
-
-
-const addressExtraction = function(line) {
-  var regexs = [
-    /(?<street>.+)\s<br\/>\s(?<city>.+),\s(?<state>.+)\s(?<zip>\d+)\s(?<country>\S+)/,
-    /(?<street>.+)\s<br\/>\s(?<city>.+),\s(?<state>.+)\s(?<zip>\d+)/,
-    /^<br\/>\s(?<country>\w+)/,
-  ]
-  
-  return regexs.filter((regex) => {
-    return regex.test(line);
-  }).reduce((obj, regex) => {
-    var matched = line.match(regex);
-    Object.assign(obj, matched.groups);
-    return obj;
-  }, {})
-
-}
-
-
-
-const fingerprint = function(namespace, string) {
-
-  if (typeof string != 'string') {
-    // maybe this needs to be smarter and be able to handle arrays.
-    var sorted = sortKeysRecursive(string)
-    string = JSON.stringify(sorted);
-  }
-
-  var buffer = Buffer.from(string); 
-  var signature = buffer.toString('base64');
-
-
-  return createHmac('sha256', namespace)
-    .update(signature)
-    .digest('hex');
-}
-
-
-
-function copyObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-
-
-
-var ignorance = function(line, ignore) {
-
-  var array = ignore.map((rule) => { 
-    switch(rule.type) {
-      case 'contains':
-	return line.indexOf(rule.value) > -1;
-      case 'startsWith':
-	return line.indexOf(rule.value) == 0;
-      case 'exact':
-	return line == rule.value;
-      default:
-	return false;
-    }
-  });
-  
-  return array.indexOf(true) == -1;
-}
-
-
-
-
-var modulator = function(state, line, transitions=[]) {
-
-  var any = transitions.filter((transition) => { 
-    return transition.states == undefined;
-  });
-
-  var currentState = transitions.filter((transition) => { 
-    return transition.states != undefined && transition.states.indexOf(state) > -1;
-  });
-
-  var relevant = any.concat(currentState);
-
-  var array = relevant.filter((transition) => { 
-    switch(transition.trigger.type) {
-      case 'endsWith':
-	return line[line.length-1] == transition.trigger.value;
-      case 'contains':
-	return line.indexOf(transition.trigger.value) > -1;
-      case 'startsWith':
-	return line.indexOf(transition.trigger.value) == 0;
-      case 'exact':
-	return line == transition.trigger.value;
-      default:
-	return false;
-    }
-  });
-
-  if (array.length > 0) {
-    return array;
-  } else {
-    return [];
-  }
-
-}
+const { 
+  newCursor, 
+  modulatorize, 
+  extraction,
+  extractor, 
+  fingerprint, 
+  ignoramous,
+  copyObj, 
+  merge, 
+  constructOptions 
+} = require(path.join(__dirname, 'tools'));
 
 
 
 
 
-
-var parser = function(html, config={}, meta={}) {
+var searchList = function(html, config={}, meta={}) {
  
   if (config.meta) {
     Object.assign(meta, {version: {cache: fingerprint('list', html)}});
   }
-
-  //console.log(config);
 
   var ignoranceRules = [
     {type: 'startsWith', value: '<td style="display: none;">'},
@@ -162,6 +43,8 @@ var parser = function(html, config={}, meta={}) {
     {type: 'exact', value: '<br />'},
     {type: 'exact', value: ''}
   ];
+
+  var ignorance = ignoramous(ignoranceRules);
 
   var transitions = [{
     name: 'entities',
@@ -244,14 +127,15 @@ var parser = function(html, config={}, meta={}) {
       type: 'startsWith',
       value: '<a name='
     },
-    action: 'headers:push',
-    regex: /\>(.+)\</
+    action: 'headers:push'
   }];
 
   var fields = {
     id_number: 'id_number'
   }
 
+
+  var modulator = modulatorize(transitions);
 
   var context = {state: 'scan', parser: 'none', headers: []};
 
@@ -335,7 +219,7 @@ var parser = function(html, config={}, meta={}) {
                 return name.replace('_number', '');
 	      }
 
-	      var matched = line.match(modulation.regex);
+	      var matched = line.match(/\>(.+)\</);
 	      var header = matched[1];
 	      header = header.toLowerCase().replace(/[.,'\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ').join('_')
 	      
@@ -368,11 +252,11 @@ var parser = function(html, config={}, meta={}) {
 	 
 	  switch(name) {
             case 'individuals_address':
-	      var address = addressExtraction(line)
+	      var address = extraction.address(line)
 	      obj.current.address = address
 	      break;
 	    case 'address':
-	      var address = addressExtraction(line)
+	      var address = extraction.address(line)
 	      obj.current.address = address;
 	      break;
 	    case 'url':
@@ -421,14 +305,14 @@ var parser = function(html, config={}, meta={}) {
   }) 
 }
 
-module.exports.parse = parser;
+module.exports.searchList = searchList;
 
 
 
 
 
 
-var company = function(html, config={}, meta={}) {
+var entity = function(html, config={}, meta={}) {
 
   if (config.meta) {
     Object.assign(meta, {cache: fingerprint('entity', html)});
@@ -440,6 +324,9 @@ var company = function(html, config={}, meta={}) {
     {type: 'exact', value: '<td>'}
   ];
   
+  var ignorance = ignoramous(ignoranceRules);
+
+ 
   var transitions = [{
     name: 'after:head', 
     trigger: { type: 'startsWith', value: '<table id="MainContent_headertext"'}, 
@@ -519,6 +406,8 @@ var company = function(html, config={}, meta={}) {
     },
     action: 'collect:filings'
   }];
+
+  var modulator = modulatorize(transitions);
 
   var context = {state: 'scan', parser: 'none', headers: []};
 
@@ -761,4 +650,4 @@ var company = function(html, config={}, meta={}) {
   }) 
 }
 
-module.exports.company = company;
+module.exports.entity = entity;

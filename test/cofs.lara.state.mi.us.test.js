@@ -1,138 +1,110 @@
 process.env.NODE_ENV = 'test';
+
 var path        = require('path');
 var assert      = require('assert');
 
 var cofs = require(path.join(__dirname, '..', 'cofs.lara.state.mi.us'));
 var parsers = require(path.join(__dirname, '..', 'cofs.lara.state.mi.us', 'parsers'));
 
+console.log(cofs);
+
 describe('Michigan', () => {
   describe('Services', () => {
     describe('cofs.lara.state.mi.us', () => {
-      
+
       it('entity', (done) => {
-	var options = {cache: true, meta: true};
-	cofs.entities('crosby', options).then((list) => {
-	  //console.log(list);
-	  //assert.equal(list.data[0].entity_name, 'RYAN, L.L.C.')
+	var options = {cache: true, meta: true, ttl: 300000};
+	cofs.entities('ryan llc', options).then((list) => {
+	  assert.equal(list.data[0].entity_name, 'RYAN, L.L.C.')
 	  done();
 	}).catch(console.log);
-
       });
 
       it('entity:page:2 (the next cursor)', (done) => {
-	var options = {cache: true, meta: true};
+	var options = {cache: true, meta: true, ttl: 300000};
 	var query = {
-	    SearchValue: 'crosby',
-	      SortColumn: '',
-	      SortDirection: '',
-	      SearchType: 'E',
-	      SearchMethod: 'B',
-	      StartRange: 26,
-	      EndRange: 50
-	  }
+	  SearchValue: 'crosby',
+	  SortColumn: '',
+	  SortDirection: '',
+	  SearchType: 'E',
+	  SearchMethod: 'B',
+	  StartRange: 26,
+	  EndRange: 50
+	}
 
 	cofs.entities(query, options).then((list) => {
-	  //console.log(list);
 	  assert.equal(list.meta.total_records, list.meta.next_cursor.EndRange)
+	  // console.log(list);
 	  done();
 	}).catch(console.log);
-
       });
 
-
-
       it('individual', (done) => {
-	var options = {cache: true, meta: true};
-	cofs.individuals('crosby', options).then((list) => {
-	  //console.log(list);
+	var options = {cache: true, meta: true, ttl: 300000};
 
+	cofs.individuals('crosby', options).then((list) => {
 	  assert.equal(list.data[0].entity_name, '1103 13TH STREET, LLC')
 	  done();
 	}).catch(console.log);
-
       });
 
-      it('byId', (done) => {
-	
-	var data = {
-	  SearchValue: '801872402', 
-	  SearchMethod: 'B'
-	};
+      it('find', (done) => {
+	var options = {cache: true, hidden: false, ttl: 300000};
 
-	var options = {cache: true, hidden: false};
-	cofs.byId(data.SearchValue, options).then((data) => {
+	cofs.find("801872402", options).then((data) => {
 	  assert.equal(data.resident_agent.name, 'THE CORPORATION COMPANY');
 	  assert.equal(data.id, '801872402')
-	  //console.log(data);
 	  done();
 	}).catch(console.log);
       });
 
-      it('byId KOBAYASHI', (done) => {
-	
-	var data = {
-	  SearchValue: '800956413', 
-	  SearchMethod: 'B'
-	};
-
-	var options = {cache: true};
-	cofs.byId(data.SearchValue, options).then((data) => {
+      it('find KOBAYASHI', (done) => {
+	var options = {cache: true, ttl: 300000};
+	cofs.find('800956413', options).then((data) => {
 	  assert.equal(data.id, '800956413')
-          //console.log(data);
 	  done();
 	}).catch(console.log);
       });
 
-      it('byId ACCEPTANCE', (done) => {
-	
-	var data = {
-	  SearchValue: '801006468', 
-	  SearchMethod: 'B'
-	};
-
-	var options = {cache: true};
-	cofs.byId(data.SearchValue, options).then((data) => {
+      it('find ACCEPTANCE', (done) => {
+	var options = {cache: true, ttl: 300000};
+	cofs.find("801006468", options).then((data) => {
 	  assert.equal(data.id, '801006468')
 	  assert.equal(data.resident_agent.name, 'THE CORPORATION COMPANY');
 	  done();
 	}).catch(console.log);
       });
 
-      it('byId LLC', (done) => {
-	
-	var data = {
-	  SearchValue: '801869963', 
-	  SearchMethod: 'B'
-	};
-
-	var options = {cache: true};
-	cofs.byId(data.SearchValue, options).then((data) => {
+      it('find LLC', (done) => {
+	var options = {cache: true, ttl: 300000};
+	cofs.find("801869963", options).then((data) => {
 	  assert.equal(data.id, '801869963')
 	  assert.equal(data.resident_agent.name, 'CSC-LAWYERS INCORPORATING SERVICE (COMPANY)');
-	  
-	  //console.log(data);
 	  done();
 	}).catch(console.log);
       });
 
-      it('byId LLC', (done) => {
-	
-	var data = {
-	  SearchValue: '802691192', 
-	  SearchMethod: 'B'
-	};
-
-	var options = {cache: true};
-	cofs.byId(data.SearchValue, options).then((data) => {
+      it('find LLC', (done) => {
+	var options = {cache: true, ttl: 300000};
+	cofs.find("802691192", options).then((data) => {
+	  //console.log(data);
 	  assert.equal(data.id, '802691192')
 	  //assert.equal(data.resident_agent.name, 'CSC-LAWYERS INCORPORATING SERVICE (COMPANY)');
-	  
-	  //console.log(data);
 	  done();
 	}).catch(console.log);
       });
 
+      xit('filings', (done) => {
+	var id = '802691192';
+
+	var options = {cache: true};
+	cofs.filings(id, options).then((data) => {
+	  done();
+	}).catch(console.log);
+      });
 
     });
   });
 });
+
+

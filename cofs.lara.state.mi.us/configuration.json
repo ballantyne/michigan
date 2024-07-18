@@ -1,0 +1,20 @@
+{
+  "default": { 
+    "hostname": "cofs.lara.state.mi.us",
+    "headers": {
+      "Host":    "cofs.lara.state.mi.us",
+      "Origin":  "https://cofs.lara.state.mi.us"
+    }
+  },
+  "post": {
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+  },
+  "get": {
+    "method": "GET"
+  }
+}
+
+

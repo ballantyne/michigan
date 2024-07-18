@@ -1,124 +1,63 @@
 const path = require('path');
-const https = require('https');
-const qs = require('querystring');
+const http = require(path.join(__dirname, 'http'));
 
-
-const Cache = require('cache-rules-everything-around-me');
 const Parser = require(path.join(__dirname, 'parsers'));
 
+const { 
+  applyOptions,
+  constructQuery,
+  prepare,
+  paths
+} = require(path.join(__dirname, 'tools'));
 
 
 
 
 
-const service = {
-  protocol: "https:", 
-  hostname: "cofs.lara.state.mi.us", 
-  paths: {
-    search: "/SearchApi/Search/Search/GetSearchResults"
-  }
-}
-
-
-
-
-
-function applyDefaults(params) {
-  if (params.StartRange == undefined) {
-    params.StartRange = 1
-  }
+const findById = function(id, config={}) {
+  var params = constructQuery('byId', { SearchValue: id })
   
-  if (params.EndRange == undefined) {
-    params.EndRange = 25
-  }
-  
-  if (params.SortColumn == undefined) { 
-    params.SortColumn = ''; 
-  }
-  
-  if (params.SortDirection == undefined) {
-    params.SortDirection = ''; 
-  }
-  
-  return params;
-}
-
-
-
-const get = function(_path, config={}) {
-  var cacheOptions = {};
-  
-  var options = {
-    method: 'GET',
-    hostname: service.hostname,
-    headers: {
-      Host:    "cofs.lara.state.mi.us",
-      Origin:  "https://cofs.lara.state.mi.us",
-      Referer: "https://cofs.lara.state.mi.us/SearchApi/Search/Search",
-    }
-  }
-
-  if (/^https/.test(_path)) {
-    _path = _path.replace(options.headers.Origin, '');
-  }
-
-  options.path = _path;
-
-
-  if (config.parse == undefined) {
-    config.parse = true;
-  }
-
-
   if (config.cache == undefined) {
-    config.cache == false;
+    config.cache = false;
   }
+
+  return new Promise(async(resolve) => {
+    var options = applyOptions('default', 'post', {path: paths.search}); 
+    config.signature = {options: options, function: 'find', id: id};
+    var cache = await prepare(config);
+
+    if (config.cache && cache.missed == false) {
+      var response = JSON.parse(cache.data);
+    } else {
+      // fetch redirect
+      var response = await http.post(options, params, config);
+      
+      var options = applyOptions('default', 'get')
+
+      // parse and configure get options
+      var url = response.body.replace('window.open(\'', '').replace("','_self')", '')
+      options.path = url.replace(options.headers.Origin, '');
+
+      //console.log(options);
+
+      var response = await http.get(options, config);
+    }
+
+    // parse entity
+    var entity = await Parser.entity(response.body, config, {url: url});
+
+    if (config.cache && cache.missed) {
+      await cache.write(JSON.stringify(response));
+    }
+
+    if (config.meta && config.response) {
+      entity.response = response
+    }
   
-
-  if (config.ttl) {
-    cacheOptions.ttl = config.ttl;
-  }
-
-
-  return new Promise((resolve,reject) => {
-    var cache = new Cache({
-      silo: 'lara.cofs', 
-      signature: {options: options}
-    })
-
-    cache.fetch(cacheOptions).then(async() => {
-      if (cache.missed) {
-	if (config.verbose) {
-          console.log('no cache');
-	}
-
-	const req = https.request(options, res => {
-	  const chunks = [];
-
-	  res.on('data', data => chunks.push(data))
-
-	  res.on('end', async() => {
-	    let resBody = Buffer.concat(chunks).toString();
-          
-	    if (config.cache) {
-	      await cache.write(resBody);
-	    } 
-            
-	    resolve(resBody);
-	  });
-	})
-
-	req.on('error',reject);
-
-	req.end();
-      } else {
-	resolve(cache.data);
-      }
-
-    })
+    resolve(entity);
   })
-
 }
+module.exports.find = findById;
 
 
 
@@ -128,115 +67,60 @@ const get = function(_path, config={}) {
 
 
 
-const post = function(_path, data, config={}) {
-  var cacheOptions = {};
 
-  if (config.parse == undefined) {
-    config.parse = true;
+
+const search = function(query, config) {
+  var params, options;
+
+  if (config.type == 'undefined') {
+    config.type = 'entities';
   }
+
+  if (typeof query == 'string') {
+    params = constructQuery('sort', 'first', config.type, {SearchValue: query});
+  } else {
+    params = query;
+  }
+
+  options = applyOptions('default', 'post', {path: paths.search})
 
   if (config.cache == undefined) {
-    config.cache == false;
+    config.cache = false;
   }
 
-  if (config.ttl) {
-    cacheOptions.ttl = config.ttl;
-  }
+  return new Promise(async(resolve) => {
+    config.signature = {function: config.type, options: options, params: params}; 
+    var cache = await prepare(config);
 
-  if (data != undefined) {
-    var postData = qs.stringify(data);
-  }
-
-  return new Promise((resolve,reject) => {
-    var options = {
-      method: 'POST',
-      hostname: service.hostname,
-      path:     _path,
-      headers: {
-	"Content-Length": postData.length,
-	"Content-Type":  "application/x-www-form-urlencoded; charset=UTF-8",
-	Host:    "cofs.lara.state.mi.us",
-	Origin:  "https://cofs.lara.state.mi.us",
-	Referer: "https://cofs.lara.state.mi.us/SearchApi/Search/Search",
-      }
+    if (config.cache && cache.missed == false) {
+      var response = JSON.parse(cache.data);
+    } else {
+      var response = await http.post(options, params, config);
     }
 
-    //console.log(options);
-    //console.log('data:',data);
+    var list = await Parser.searchList(response.body, config, {params: params});
     
-    var cache = new Cache({
-      silo: 'lara.cofs', 
-      signature: {options: options, data: postData}
-    })
+    if (config.cache && cache.missed) {
+      await cache.write(JSON.stringify(response));
+    }
 
-    cache.fetch(cacheOptions).then(async() => {
-      if (cache.missed) {
-	if (config.verbose) {
-          console.log('no cache');
-	}
+    if (config.meta && config.response) {
+      list.response = response
+    }
 
-	const req = https.request(options, res => {
-	  const chunks = [];
-
-	  res.on('data', data => chunks.push(data))
-
-	  res.on('end', async() => {
-	    let resBody = Buffer.concat(chunks).toString();
-          
-	    if (config.cache) {
-	      await cache.write(resBody);
-	    } 
-            
-	    resolve(resBody);
-	  
-	  });
-
-	})
-
-	req.on('error',reject);
-
-	if (data != undefined) {
-	  req.write(postData)
-	}
-
-	req.end();
-      } else {
-	resolve(cache.data);
-      }
-
-    })
+    resolve(list);
   })
 }
-module.exports.post = post;
+
+module.exports.search = search;
 
 
 
 
 
-
-
-const entities = function(params, config={}) {
-  if (typeof params == 'string') {
-    params = {SearchValue: params}
-  }
-
-  params = applyDefaults(params);
-
-  if (params.SearchType == undefined) {
-    params.SearchType = 'E';
-  } 
-
-  if (params.SearchMethod == undefined) {
-    params.SearchMethod = 'B';
-  }
-  //console.log(params);
-
-  return new Promise((resolve) => {
-    post(service.paths.search, params, config).then(async(html) => {
-      var list = await Parser.parse(html, config, {params: params});
-      resolve(list);
-    }).catch(console.log);
-  })
+const entities = function(query, config={}) {
+  config.type = 'entities';
+  return search(query, config);
 }
 module.exports.entities = entities;
 
@@ -244,75 +128,11 @@ module.exports.entities = entities;
 
 
 
-
-
-const individuals = function(params, config={}) {
-  if (typeof params == 'string') {
-    params = {SearchValue: params}
-  }
-
-  params = applyDefaults(params);
-
-  if (params.SearchType == undefined) {
-    params.SearchType = 'I';
-  } 
- 
-  if (params.SearchMethod == undefined) {
-    params.SearchMethod = 'B';
-  } 
- 
-  //console.log(params);
-
-  return new Promise((resolve) => {
-    post(service.paths.search, params, config).then(async(html) => {
-      var list = await Parser.parse(html, config, {params: params});
-      resolve(list);
-    })
-  })
+const people = function(query, config={}) {
+  config.type = 'individual';
+  return search(query, config);
 }
-module.exports.individuals = individuals;
-
-
-
-
-
-
-
-const entity = function(url, config={}) {
-  return new Promise((resolve) => {
-    get(url, config).then(async(html) => {
-      var list = await Parser.company(html, config, {url: url});
-      resolve(list);
-    });
-  })
-}
-module.exports.entity = entity;
-
-
-
-
-
-
-
-const byId = function(id, config={}) {
-  var params = {
-    SearchValue: id,
-    SearchType: 'N'
-  }
-
-  config.parse = false; 
-
-  return new Promise((resolve) => {
-    post(service.paths.search, params, config).then(async(html) => {
-      var url = html.replace('window.open(\'', '').replace("','_self')", '')
-      entity(url, config).then(async(data) => {
-        resolve(data);
-      });
-    })
-  })
-}
-module.exports.byId = byId;
-
+module.exports.individuals = people;
 
 
 
