@@ -1,19 +1,33 @@
 {
   "name": "michigan",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "scripts": {
     "test": "mocha --extension js --extension json -w test/"
   },
   "keywords": [
     "michigan",
+    "government",
     "cofs",
     "lara",
-    "fakeApi"
+    "artificial:api",
+    "business",
+    "corporate",
+    "filing",
+    "system"
   ],
+  "homepage": "https://github.com/ballantyne/michigan#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ballantyne/michigan.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ballantyne/michigan/issues",
+    "email": "scottballantyne@protonmail.com"
+  }
   "author": "Scott Ballantyne",
   "license": "MIT",
-  "description": "",
+  "description": "this is a place to collect useful data service code related to michigan",
   "dependencies": {
     "cache-rules-everything-around-me": "^1.0.0"
   }
