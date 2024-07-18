@@ -1,6 +1,6 @@
 # michigan
 
-I just thought I would put this here for the time being.  Maybe there will be a readme someday.  This module isn't quite done.  I still need to figure out the asp form token stuff so I can get the filings.  If you figure it out, make the changes and add them here.
+I have cleaned the basic functionality.  I still haven't really attempted to obtain the filings.  Shouldn't be too difficult to do.  I guess I could write more of a readme, but I recently changed the names of functions, so why not wait a little while longer.
 
 If michigan wants their name back I am happy to hand it over.  Also if they want to maintain this code I would be ok with that too.  
 
