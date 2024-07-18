@@ -16,6 +16,7 @@ function readJSON(file) {
   var data = fs.readFileSync(file);
   var string = data.toString();
   var json
+
   try {
     json = JSON.parse(string);
   } catch(error) {
@@ -37,10 +38,6 @@ function requireJSON(file) {
   }
 }
 module.exports.requireJSON = requireJSON;
-
-
-var defaults = requireJSON(path.join(__dirname, 'defaults'));
-var queries  = requireJSON(path.join(__dirname, 'queries'));
 
 
 
@@ -130,17 +127,6 @@ const constructOptions = function(cfg={}) {
   }
 }
 module.exports.constructOptions = constructOptions;
-
-
-
-
-var constructQuery = constructOptions(queries);
-module.exports.constructQuery = constructQuery;
-
-
-
-var applyOptions = constructOptions(defaults);
-module.exports.applyOptions = applyOptions;
 
 
 

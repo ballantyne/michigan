@@ -1,14 +1,21 @@
 const path = require('path');
-const http = require(path.join(__dirname, 'http'));
+const http = require(path.join(__dirname, '..', 'http'));
 
 const Parser = require(path.join(__dirname, 'parsers'));
 
 const { 
-  applyOptions,
-  constructQuery,
+  constructOptions,
   prepare,
-  paths
-} = require(path.join(__dirname, 'tools'));
+  paths,
+  requireJSON
+} = require(path.join(__dirname, '..', 'tools'));
+
+
+var defaults = requireJSON(path.join(__dirname, 'defaults'));
+var queries  = requireJSON(path.join(__dirname, 'queries'));
+
+var constructQuery = constructOptions(queries);
+var applyOptions = constructOptions(defaults);
 
 
 
