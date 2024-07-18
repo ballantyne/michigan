@@ -30,5 +30,8 @@
   "description": "this is a place to collect useful data service code related to michigan",
   "dependencies": {
     "cache-rules-everything-around-me": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.6.0"
   }
 }
