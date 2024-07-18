@@ -46,8 +46,6 @@ const findById = function(id, config={}) {
       var url = response.body.replace('window.open(\'', '').replace("','_self')", '')
       options.path = url.replace(options.headers.Origin, '');
 
-      //console.log(options);
-
       var response = await http.get(options, config);
     }
 
