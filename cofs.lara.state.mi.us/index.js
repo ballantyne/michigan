@@ -1,5 +1,5 @@
 const path = require('path');
-const http = require(path.join(__dirname, '..', 'http'));
+const http = require(path.join(__dirname, '..', 'utils', 'http'));
 
 const Parser = require(path.join(__dirname, 'parsers'));
 
@@ -8,7 +8,7 @@ const {
   prepare,
   paths,
   requireJSON
-} = require(path.join(__dirname, '..', 'tools'));
+} = require(path.join(__dirname, '..', 'utils'));
 
 
 var defaults = requireJSON(path.join(__dirname, 'defaults'));

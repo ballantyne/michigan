@@ -14,7 +14,7 @@ const {
   merge, 
   requireJSON,
   constructOptions 
-} = require(path.join(__dirname, '..', '..', 'tools'));
+} = require(path.join(__dirname, '..', '..', 'utils'));
 
 
 

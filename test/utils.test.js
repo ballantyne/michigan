@@ -6,7 +6,7 @@ var assert = require('assert');
 var {
   constructOptions,
   requireJSON
-} = require(path.join(__dirname, '..', 'tools'));
+} = require(path.join(__dirname, '..', 'utils'));
 
 
 describe('Michigan', () => {
