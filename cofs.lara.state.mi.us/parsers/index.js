@@ -43,10 +43,10 @@ var search = function(html, config={}, meta={}) {
 
       var line = raw.trim();
  
-      if (ignorance(line, ignoranceRules)) {
+      if (ignorance(line)) {
 	line = line.replace('<td>', '').replace('</td>', '').trim();
 
-        var modulations = modulator(context.state, line, transitions);
+        var modulations = modulator(context.state, line);
 
 	if (config.verbose) {
 	  console.log('');
@@ -251,13 +251,13 @@ var entity = function(html, config={}, meta={}) {
 
       var line = raw.trim();
 
-      if (ignorance(line, ignoranceRules)) {
+      if (ignorance(line)) {
         //console.log('processing', raw);
 
 
 	line = line.replace('<td>', '').replace('</td>', '').trim();
 
-        var modulations = modulator(context.state, line, transitions);
+        var modulations = modulator(context.state, line);
 
 	if (config.verbose) {
 	  console.log('');
