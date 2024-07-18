@@ -1,0 +1,62 @@
+[
+  {
+    "type": "startsWith",
+    "value": "<td style=\"display: none;\">"
+  },
+  {
+    "type": "exact",
+    "value": "</a>"
+  },
+  {
+    "type": "exact",
+    "value": "</tr>"
+  },
+  {
+    "type": "exact",
+    "value": "</td>"
+  },
+  {
+    "type": "exact",
+    "value": "<td>"
+  },
+  {
+    "type": "exact",
+    "value": "</div>"
+  },
+  {
+    "type": "exact",
+    "value": "</th>"
+  },
+  {
+    "type": "exact",
+    "value": "</thead>"
+  },
+  {
+    "type": "startsWith",
+    "value": "<th id=\""
+  },
+  {
+    "type": "startsWith",
+    "value": "<thead>"
+  },
+  {
+    "type": "startsWith",
+    "value": "<div id=\"navigator\">"
+  },
+  {
+    "type": "startsWith",
+    "value": "<div align=\"center\" style=\"height: 50px;\">"
+  },
+  {
+    "type": "startsWith",
+    "value": "<a class=\"linkButton\" id=\"newSearch\" name=\"RedirectSearch\" "
+  },
+  {
+    "type": "exact",
+    "value": "<br />"
+  },
+  {
+    "type": "exact",
+    "value": ""
+  }
+]

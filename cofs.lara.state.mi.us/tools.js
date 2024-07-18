@@ -13,9 +13,31 @@ module.exports.paths = {
 
 
 function readJSON(file) {
-  return JSON.parse(fs.readFileSync(file).toString());
+  var data = fs.readFileSync(file);
+  var string = data.toString();
+  var json
+  try {
+    json = JSON.parse(string);
+  } catch(error) {
+    console.log(file);
+    console.log(string);
+    console.log(error);
+  }
+
+  return json;
 }
 module.exports.readJSON = readJSON;
+
+
+function requireJSON(file) {
+  if (process.env.NODE_ENV == 'production') {
+    return require(file)
+  } else {
+    return readJSON([file, 'json'].join('.'));
+  }
+}
+module.exports.requireJSON = requireJSON;
+
 
 
 var defaults = readJSON(path.join(__dirname, 'defaults.json'));

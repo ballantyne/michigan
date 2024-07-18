@@ -1,0 +1,110 @@
+[
+  {
+    "name": "after:head",
+    "trigger": {
+      "type": "startsWith",
+      "value": "<table id=\"MainContent_headertext\""
+    },
+    "sets": {
+      "state": "collect"
+    }
+  },
+  {
+    "name": "capture:officer",
+    "state": [
+      "officers:collect"
+    ],
+    "trigger": {
+      "type": "startsWith",
+      "value": "<td valign=\"top\">"
+    },
+    "action": "capture:officer"
+  },
+  {
+    "name": "officers",
+    "trigger": {
+      "type": "contains",
+      "value": "<table class=\"Grid\""
+    },
+    "sets": {
+      "state": "officers:collect",
+      "parser": "officer"
+    }
+  },
+  {
+    "name": "value",
+    "trigger": {
+      "type": "contains",
+      "value": "<span id=\"MainContent_lbl"
+    },
+    "action": "value:capture"
+  },
+  {
+    "name": "filing:state",
+    "trigger": {
+      "type": "contains",
+      "value": "MainContent_lstFilings"
+    },
+    "sets": {
+      "state": "collect:filings"
+    }
+  },
+  {
+    "name": "token",
+    "trigger": {
+      "type": "startsWith",
+      "value": "<form method=\"post\" action=\"./CorpSummary.aspx?token="
+    },
+    "action": "token",
+    "sets": {
+      "state": "collect:keys"
+    }
+  },
+  {
+    "name": "viewstate",
+    "states": [
+      "collect:keys"
+    ],
+    "trigger": {
+      "type": "contains",
+      "value": "__VIEWSTATE\" value=\""
+    },
+    "action": "viewstate"
+  },
+  {
+    "name": "viewstate:generator",
+    "states": [
+      "collect:keys"
+    ],
+    "trigger": {
+      "type": "contains",
+      "value": "__VIEWSTATEGENERATOR\" value=\""
+    },
+    "action": "viewstate:generator"
+  },
+  {
+    "name": "event:validation",
+    "states": [
+      "collect:keys"
+    ],
+    "trigger": {
+      "type": "contains",
+      "value": "__EVENTVALIDATION\" value=\""
+    },
+    "action": "event:validation",
+    "sets": {
+      "state": "scan"
+    }
+  },
+  {
+    "name": "collect:filings",
+    "states": [
+      "collect:filings"
+    ],
+    "trigger": {
+      "type": "startsWith",
+      "value": "<option"
+    },
+    "action": "collect:filings"
+  }
+]

@@ -6,7 +6,7 @@ var assert      = require('assert');
 var cofs = require(path.join(__dirname, '..', 'cofs.lara.state.mi.us'));
 var parsers = require(path.join(__dirname, '..', 'cofs.lara.state.mi.us', 'parsers'));
 
-console.log(cofs);
+//console.log(cofs);
 
 describe('Michigan', () => {
   describe('Services', () => {

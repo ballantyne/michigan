@@ -12,8 +12,9 @@ const {
   ignoramous,
   copyObj, 
   merge, 
+  requireJSON,
   constructOptions 
-} = require(path.join(__dirname, 'tools'));
+} = require(path.join(__dirname, '..', 'tools'));
 
 
 
@@ -25,110 +26,11 @@ var searchList = function(html, config={}, meta={}) {
     Object.assign(meta, {version: {cache: fingerprint('list', html)}});
   }
 
-  var ignoranceRules = [
-    {type: 'startsWith', value: '<td style="display: none;">'},
-    {type: 'exact', value: '</a>'},
-    {type: 'exact', value: '</tr>'},
-    {type: 'exact', value: '</td>'},
-    {type: 'exact', value: '<td>'},
-    {type: 'exact', value: '</div>'},
-    {type: 'exact', value: '</th>'},
-    {type: 'exact', value: '</thead>'},
-
-    {type: 'startsWith', value: '<th id="'},
-    {type: 'startsWith', value: '<thead>'},
-    {type: 'startsWith', value: '<div id="navigator">'},
-    {type: 'startsWith', value: '<div align="center" style="height: 50px;">'},
-    {type: 'startsWith', value: '<a class="linkButton" id="newSearch" name="RedirectSearch" '},
-    {type: 'exact', value: '<br />'},
-    {type: 'exact', value: ''}
-  ];
+  var ignoranceRules = requireJSON(path.join(__dirname, 'search', 'ignore'));
 
   var ignorance = ignoramous(ignoranceRules);
 
-  var transitions = [{
-    name: 'entities',
-    states: ['scan'],
-    trigger: {
-      type: 'startsWith', 
-      value: '<table id="entityData"'
-    },
-    sets: {
-      parser: 'entity',
-      state: 'header:collect'
-    }
-  }, {
-    name: 'individual', 
-    states: ['scan'],
-    trigger: {
-      type: 'startsWith', 
-      value: '<table id="individualData"'
-    },
-    sets: {
-      parser: 'individual',
-      state: 'header:collect'
-    }
-  }, {
-    name: 'total_pages',
-    trigger: {
-      type: 'contains',
-      value: 'TotalPages'
-    },
-    action: 'total_pages'
-  }, {
-    name: 'total_records',
-    trigger: {
-      type: 'contains',
-      value: 'TotalRecords'
-    },
-    action: 'total_records'
-  },{
-    name: 'scan',
-    trigger: {
-      type: 'exact',
-      value: '</tbody>'
-    },
-    states: ['collect'],
-    sets: {
-      state: "scan"
-    }
-  }, {
-    name: 'collect',
-    trigger: {
-      type: 'startsWith',
-      value: '<tbody>'
-    },
-    states: ['header:collect'],
-    sets: {
-      state: "collect"
-    }
-  }, {
-    name: 'push',
-    states: ['collect'],
-    trigger: {
-      type: 'exact',
-      value: '<tr class="GridRow">'
-    },
-    action: 'newRecord'
-  }, {
-    name: 'clear:header',
-    trigger: {
-      type: 'startsWith',
-      value: '<tr class="GridHeader"'
-    },
-    states: ['header:collect'],
-    sets: {
-      headers: []
-    }
-  }, {
-    name: 'add:header',
-    states: ['header:collect'],
-    trigger: {
-      type: 'startsWith',
-      value: '<a name='
-    },
-    action: 'headers:push'
-  }];
+  var transitions = requireJSON(path.join(__dirname, 'search', 'transitions'));
 
   var fields = {
     id_number: 'id_number'
@@ -318,95 +220,10 @@ var entity = function(html, config={}, meta={}) {
     Object.assign(meta, {cache: fingerprint('entity', html)});
   }
 
-  var ignoranceRules = [
-    {type: 'exact', value: '&nbsp;'},
-    {type: 'exact', value: ''}, 
-    {type: 'exact', value: '<td>'}
-  ];
-  
+  var ignoranceRules = requireJSON(path.join(__dirname, 'entity', 'ignore'));
   var ignorance = ignoramous(ignoranceRules);
-
  
-  var transitions = [{
-    name: 'after:head', 
-    trigger: { type: 'startsWith', value: '<table id="MainContent_headertext"'}, 
-    sets: {state: 'collect'}
-  }, {
-    name: 'capture:officer',
-    state: ['officers:collect'],
-
-    trigger: {
-      type: 'startsWith',
-      value: '<td valign="top">'
-    },
-    action: 'capture:officer'
-  }, {
-    name: 'officers',
-    trigger: {
-      type: 'contains',
-      value: '<table class="Grid"'
-    },
-    sets:{
-      state: 'officers:collect',
-      parser: 'officer'
-    }
-  }, {
-    name: 'value',
-    trigger: {
-      type: 'contains',
-      value: '<span id="MainContent_lbl'
-    },
-    action: 'value:capture'
-  }, {
-    name: 'filing:state',
-    trigger: {
-      type: 'contains', 
-      value: 'MainContent_lstFilings'
-    },
-    sets: {state: 'collect:filings'}
-  },{
-    name: 'token',
-    trigger: {
-      type: 'startsWith', 
-      value: '<form method="post" action="./CorpSummary.aspx?token='
-    },
-    action: 'token',
-    sets: {state: 'collect:keys'}
-  },{
-    name: 'viewstate',
-    states: ['collect:keys'],
-    trigger: {
-      type: 'contains', 
-      value: '__VIEWSTATE" value="'
-    },
-    action: 'viewstate'
-  },{
-    name: 'viewstate:generator',
-    states: ['collect:keys'],
-    trigger: {
-      type: 'contains', 
-      value: '__VIEWSTATEGENERATOR" value="'
-    },
-    action: 'viewstate:generator'
-  },{
-    name: 'event:validation',
-    states: ['collect:keys'],
-    trigger: {
-      type: 'contains', 
-      value: '__EVENTVALIDATION" value="'
-    },
-    action: 'event:validation',
-    sets: {state: 'scan'}
-  },{
-    name: 'collect:filings',
-    states: ['collect:filings'],
-    trigger: {
-      type: 'startsWith', 
-      value: '<option'
-    },
-    action: 'collect:filings'
-  }];
-
+  var transitions = requireJSON(path.join(__dirname, 'entity','transitions'));
   var modulator = modulatorize(transitions);
 
   var context = {state: 'scan', parser: 'none', headers: []};

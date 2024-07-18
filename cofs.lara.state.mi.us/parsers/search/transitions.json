@@ -1,0 +1,107 @@
+[
+  {
+    "name": "entities",
+    "states": [
+      "scan"
+    ],
+    "trigger": {
+      "type": "startsWith",
+      "value": "<table id=\"entityData\""
+    },
+    "sets": {
+      "parser": "entity",
+      "state": "header:collect"
+    }
+  },
+  {
+    "name": "individual",
+    "states": [
+      "scan"
+    ],
+    "trigger": {
+      "type": "startsWith",
+      "value": "<table id=\"individualData\""
+    },
+    "sets": {
+      "parser": "individual",
+      "state": "header:collect"
+    }
+  },
+  {
+    "name": "total_pages",
+    "trigger": {
+      "type": "contains",
+      "value": "TotalPages"
+    },
+    "action": "total_pages"
+  },
+  {
+    "name": "total_records",
+    "trigger": {
+      "type": "contains",
+      "value": "TotalRecords"
+    },
+    "action": "total_records"
+  },
+  {
+    "name": "scan",
+    "trigger": {
+      "type": "exact",
+      "value": "</tbody>"
+    },
+    "states": [
+      "collect"
+    ],
+    "sets": {
+      "state": "scan"
+    }
+  },
+  {
+    "name": "collect",
+    "trigger": {
+      "type": "startsWith",
+      "value": "<tbody>"
+    },
+    "states": [
+      "header:collect"
+    ],
+    "sets": {
+      "state": "collect"
+    }
+  },
+  {
+    "name": "push",
+    "states": [
+      "collect"
+    ],
+    "trigger": {
+      "type": "exact",
+      "value": "<tr class=\"GridRow\">"
+    },
+    "action": "newRecord"
+  },
+  {
+    "name": "clear:header",
+    "trigger": {
+      "type": "startsWith",
+      "value": "<tr class=\"GridHeader\""
+    },
+    "states": [
+      "header:collect"
+    ],
+    "sets": {
+      "headers": []
+    }
+  },
+  {
+    "name": "add:header",
+    "states": [
+      "header:collect"
+    ],
+    "trigger": {
+      "type": "startsWith",
+      "value": "<a name="
+    },
+    "action": "headers:push"
+  }
+]

@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -w test/"
+    "test": "mocha --extension js --extension json -w test/"
   },
   "keywords": [
     "michigan",
