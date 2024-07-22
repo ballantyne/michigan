@@ -141,6 +141,8 @@ function newCursor(meta) {
   delete cursor.StartRange;
   delete cursor.EndRange;
 
+  //console.log(meta);
+ 
   var newPagination = {};
   
   var pageSize = meta.params.EndRange-meta.params.StartRange;

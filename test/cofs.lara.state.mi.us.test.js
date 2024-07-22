@@ -94,6 +94,15 @@ describe('Michigan', () => {
 	}).catch(console.log);
       });
 
+      it('find error message', (done) => {
+	var options = {cache: true, ttl: 300000, meta: true, response: true};
+	cofs.find("1", options).then((data) => {
+	  assert.equal(data.error, 'There was an error with your request')
+	  done();
+	}).catch(console.log);
+      });
+
+
       xit('filings', (done) => {
 	var id = '802691192';
 

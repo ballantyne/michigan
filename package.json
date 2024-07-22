@@ -1,9 +1,12 @@
 {
   "name": "michigan",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "main": "index.js",
   "scripts": {
     "test": "mocha --extension js --extension json -w test/"
+  },
+  "bin": {
+    "cofs": "./bin/cofs.js"
   },
   "keywords": [
     "michigan",
@@ -29,7 +32,8 @@
   "license": "MIT",
   "description": "this is a place to collect useful data service code related to michigan",
   "dependencies": {
-    "cache-rules-everything-around-me": "^1.0.0"
+    "cache-rules-everything-around-me": "^1.0.0",
+    "carrier-pigeon": "^0.1.11"
   },
   "devDependencies": {
     "mocha": "^10.6.0"
