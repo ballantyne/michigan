@@ -1,6 +1,6 @@
 {
   "name": "michigan",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "index.js",
   "scripts": {
     "test": "mocha --extension js --extension json -w test/"

@@ -12,6 +12,20 @@ module.exports.paths = {
 }
 
 
+function isJSON(input) {
+  var json = false;
+  try {
+    JSON.parse(input);
+    json = true;
+  } catch(error) {
+    
+  }
+  return json;
+}
+module.exports.isJSON = isJSON;
+
+
+
 function readJSON(file) {
   var data = fs.readFileSync(file);
   var string = data.toString();

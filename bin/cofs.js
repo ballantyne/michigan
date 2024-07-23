@@ -4,6 +4,10 @@
 var path = require('path');
 var CarrierPigeon = require('carrier-pigeon');
 var cofs = require(path.join(__dirname, '..', 'cofs.lara.state.mi.us'));
+var {
+  isJSON
+} = require(path.join(__dirname, '..', 'utils'));
+
 
 var commands = ['entities', 'individuals', 'find'];
 
@@ -37,6 +41,10 @@ switch(command) {
  }
 
 var options = parser.parse(process.argv);
+
+if (isJSON(options.query)) {
+  options.query = JSON.parse(options.query);
+}
 
 cofs[command](options.query, options).then((json) => {
   console.log(json);
