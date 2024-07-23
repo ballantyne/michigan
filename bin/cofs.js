@@ -21,7 +21,7 @@ const parser = new CarrierPigeon({strict: false});
 parser.commands(...commands);
 parser.option('verbose', {default: false})
 parser.option('query');
-
+parser.option('pretty', {default: false})
 
 
 switch(command) {
@@ -46,7 +46,10 @@ if (isJSON(options.query)) {
   options.query = JSON.parse(options.query);
 }
 
-cofs[command](options.query, options).then((json) => {
-  console.log(json);
-})
-
+if (command != undefined) {
+  cofs[command](options.query, options).then((json) => {
+    console.log(JSON.stringify(json, null, (options.pretty ? 2 : 0)));
+  })
+} else {
+  console.log(JSON.stringify({error: 'command unknown', interface: "command line", argv: process.argv}))
+}
