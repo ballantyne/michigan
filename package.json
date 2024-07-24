@@ -1,6 +1,6 @@
 {
   "name": "michigan",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "index.js",
   "scripts": {
     "test": "mocha --extension js --extension json -w test/"
@@ -32,7 +32,6 @@
   "license": "MIT",
   "description": "this is a place to collect useful data service code related to michigan",
   "dependencies": {
-    "cache-rules-everything-around-me": "^1.0.0",
     "carrier-pigeon": "^0.1.11",
     "great-lakes": "^1.0.0"
   },

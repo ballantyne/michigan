@@ -21,7 +21,6 @@ const {
 
 
 
-
 var search = function(html, config={}, meta={}) {
  
   if (config.meta) {
