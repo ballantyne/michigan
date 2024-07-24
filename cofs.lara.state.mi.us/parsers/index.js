@@ -1,21 +1,23 @@
 
 const path = require('path');
 const { createHmac } = require('node:crypto');
-const sortKeysRecursive = require('sort-keys-recursive');
 
 const { 
   newCursor, 
-  modulatorize, 
-  extraction,
-  extractor, 
-  fingerprint, 
-  ignoramous,
-  copyObj, 
-  merge, 
-  requireJSON,
-  constructOptions 
+  extraction
 } = require(path.join(__dirname, '..', '..', 'utils'));
 
+const { 
+  sway,
+  alphabetize,
+  extract, 
+  fingerprint, 
+  ignorant,
+  cp, 
+  merge, 
+  requireJSON,
+  construct 
+} = require('great-lakes');
 
 
 
@@ -31,9 +33,9 @@ var search = function(html, config={}, meta={}) {
   }
   
   var ignoranceRules = requireJSON(path.join(__dirname, 'search', 'ignore'));
-  var ignorance = ignoramous(ignoranceRules);
+  var ignorance = ignorant(ignoranceRules);
   var transitions = requireJSON(path.join(__dirname, 'search', 'transitions'));
-  var modulator = modulatorize(transitions);
+  var modulator = sway(transitions);
   var context = {state: 'scan', parser: 'none', headers: []};
 
   //config.verbose = true;
@@ -72,7 +74,7 @@ var search = function(html, config={}, meta={}) {
 	
 	while(changes.length > 0) {
 	  var change = changes.shift();
-	  Object.assign(context, copyObj(change.sets));
+	  Object.assign(context, cp(change.sets));
 	}
 
 	while(actions.length > 0) {
@@ -97,7 +99,7 @@ var search = function(html, config={}, meta={}) {
 		obj.list.push(obj.current);
 	      }
 	      obj.current = {type: context.parser};
-	      obj.sequence = copyObj(context.headers);
+	      obj.sequence = cp(context.headers);
 	      break;
 	    
 	    case 'headers:push':
@@ -205,10 +207,10 @@ var entity = function(html, config={}, meta={}) {
   }
 
   var ignoranceRules = requireJSON(path.join(__dirname, 'entity', 'ignore'));
-  var ignorance = ignoramous(ignoranceRules);
+  var ignorance = ignorant(ignoranceRules);
  
   var transitions = requireJSON(path.join(__dirname, 'entity','transitions'));
-  var modulator = modulatorize(transitions);
+  var modulator = sway(transitions);
 
   var context = {state: 'scan', parser: 'none', headers: []};
 
@@ -286,7 +288,7 @@ var entity = function(html, config={}, meta={}) {
 	
 	while(changes.length > 0) {
 	  var change = changes.shift();
-	  Object.assign(context, copyObj(change.sets));
+	  Object.assign(context, cp(change.sets));
 	}
 
 	while(actions.length > 0) {
@@ -314,7 +316,7 @@ var entity = function(html, config={}, meta={}) {
 	    case 'collect:filings':
               var regex = /<option.+value="(?<id>.+)">(?<name>.+)<\/option>/
 	      var matched = line.match(regex);
-	      filings.push(copyObj(matched.groups));
+	      filings.push(cp(matched.groups));
 	      
 	      break;
 

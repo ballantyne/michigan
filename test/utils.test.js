@@ -4,9 +4,10 @@ var assert = require('assert');
 
 
 var {
-  constructOptions,
+  construct,
   requireJSON
-} = require(path.join(__dirname, '..', 'utils'));
+} = require('great-lakes');
+
 
 
 describe('Michigan', () => {
@@ -14,7 +15,7 @@ describe('Michigan', () => {
     describe('applyOptions', () => {
 
       it('get', (done) => {
-	var applyOptions = constructOptions(requireJSON(path.join(__dirname, '..', 'cofs.lara.state.mi.us', 'defaults')))
+	var applyOptions = construct(requireJSON(path.join(__dirname, '..', 'cofs.lara.state.mi.us', 'defaults')))
 	var options = applyOptions('default', 'get', {});
 
 	assert.notEqual(options.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=UTF-8');

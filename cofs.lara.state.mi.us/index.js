@@ -1,22 +1,28 @@
 const path = require('path');
-const http = require(path.join(__dirname, '..', 'utils', 'http'));
+//const http = require(path.join(__dirname, '..', 'utils', 'http'));
 
 const Parser = require(path.join(__dirname, 'parsers'));
 
 const { 
-  copyObj,
-  constructOptions,
-  prepare,
   paths,
-  requireJSON
 } = require(path.join(__dirname, '..', 'utils'));
+
+
+const { 
+  get,
+  post,
+  cp,
+  construct,
+  prepare,
+  requireJSON
+} = require('great-lakes');
 
 
 var defaults = requireJSON(path.join(__dirname, 'defaults'));
 var queries  = requireJSON(path.join(__dirname, 'queries'));
 
-var constructQuery = constructOptions(queries);
-var applyOptions = constructOptions(defaults);
+var constructQuery = construct(queries);
+var applyOptions = construct(defaults);
 
 
 
@@ -55,7 +61,7 @@ const findById = function(id, config={}) {
       var response = JSON.parse(cache.data);
     } else {
       //console.log('new request');
-      var response = await http.post(options, params, config);
+      var response = await post(options, params, config);
     }
 
     handleError(response, cache).then(async(response) => {
@@ -66,7 +72,7 @@ const findById = function(id, config={}) {
 	var url = response.body.replace('window.open(\'', '').replace("','_self')", '')
 	options.path = url.replace(options.headers.Origin, '');
 
-	var response = await http.get(options, config);
+	var response = await get(options, config);
 	
 	if (config.cache && cache.missed) {
 	  await cache.write(JSON.stringify(response));
@@ -119,11 +125,11 @@ const search = function(query, config) {
     if (config.cache && cache.missed == false) {
       var response = JSON.parse(cache.data);
     } else {
-      var response = await http.post(options, params, config);
+      var response = await post(options, params, config);
     }
 
-    var list = await Parser.search(response.body, config, copyObj({params: params}));
-    
+    var list = await Parser.search(response.body, config, cp({params: params})).catch(console.log);
+
     if (config.cache && cache.missed) {
       await cache.write(JSON.stringify(response));
     }
