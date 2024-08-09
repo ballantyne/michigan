@@ -1,6 +1,6 @@
 {
   "name": "michigan",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "main": "index.js",
   "scripts": {
     "test": "mocha --extension js --extension json -w test/"
@@ -33,7 +33,7 @@
   "description": "this is a place to collect useful data service code related to michigan",
   "dependencies": {
     "carrier-pigeon": "^0.1.11",
-    "great-lakes": "^1.0.0"
+    "great-lakes": "^1.0.5"
   },
   "devDependencies": {
     "mocha": "^10.6.0"
